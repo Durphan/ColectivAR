@@ -3,6 +3,7 @@ import cors from "cors";
 import axios from "axios";
 require("dotenv").config();
 const bodyparser = require("body-parser");
+const compression = require("compression");
 
 const app = express();
 app.use(
@@ -10,11 +11,10 @@ app.use(
     origin: "*",
   })
 );
+
+app.use(compression());
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
-
-let numero;
-let ruta;
 
 app.get("/colectivos", async (req, res) => {
   try {
@@ -81,14 +81,6 @@ app.get("/colectivos/:numero/:ruta", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
-
-app.post("/submit-form", async (req, res) => {
-  ruta = req.body.ruta;
-  numero = req.body.agencia;
-  res.json({ message: "Formulario enviado" });
-  console.log(ruta);
-  console.log(numero);
 });
 
 app.get("/colectivos-seleccionados", async (req, res) => {
