@@ -1,195 +1,108 @@
-
-
 <div id="container">	
-<form method="post" action="http://localhost:8080/submit-form" id="form">
+<form method="post" action="http://192.168.100.7:8080/submit-form" id="form">
 	<label for="agencia">Selecciona la agencia</label>
 	<select name="agencia" id="agencia">
 	</select>
 	<label for="ruta">Selecciona la ruta</label>
 	<select name="ruta" id="ruta">
 	</select>
-	<button type="submit">Buscar</button>
+	<button type="submit" id="buscar">Buscar</button>
 </form>
+<div id="map">
+</div>
+
 </div>
 
 <style>
-	#background {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		filter: blur(100px);
-		color:#111827;
-	}
+	@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
 
-	#container {
-		font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
-		height: 100%;
-	}
-
-	main {
-		height: 100%;
+	body {
+		font-family: 'Fjalla One', sans-serif;
 		display: flex;
 		justify-content: center;
-	}
-
-	#hero {
-		display: flex;
-		align-items: start;
-		flex-direction: column;
-		justify-content: center;
-		padding: 16px;
-	}
-
-	h1 {
-		font-size: 22px;
-		margin-top: 0.25em;
-	}
-
-	#links {
-		display: flex;
-		gap: 16px;
-	}
-
-	#links a {
-		display: flex;
 		align-items: center;
-		padding: 10px 12px;
-		color: #111827;
-		text-decoration: none;
-		transition: color 0.2s;
-	}
-
-	#links a:hover {
-		color: rgb(78, 80, 86);
-	}
-
-	#links a svg {
-		height: 1em;
-		margin-left: 8px;
-	}
-
-	#links a.button {
+		height: 100vh;
+		background-color: #1a1a1a;
+		margin: 0;
 		color: white;
-		background: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);
-		box-shadow:
-			inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-			inset 0 -2px 0 rgba(0, 0, 0, 0.24);
-		border-radius: 10px;
+	}
+	#container {
+		background: #d90429;
+		padding: 30px;
+		border-radius: 12px;
+		box-shadow: 5px 5px 0 rgb(0, 0, 0), 10px 10px 0 white, 15px 15px 0 black;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 90%;
+		max-width: 500px;
+	}
+	form {
+		width: 100%;
+	}
+	label {
+		font-size: 18px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+	select, button {
+		padding: 12px;
+		font-size: 18px;
+		border: 2px solid black;
+		border-radius: 6px;
+		background: white;
+		color: black;
+		font-weight: bold;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition: all 0.2s ease-in-out;
+	}
+	select:focus, button:focus {
+		outline: none;
+		border-color: white;
+	}
+	button {
+		background: black;
+		color: white;
+		border: 2px solid white;
+	}
+	button:hover {
+		background: white;
+		color: black;
+		border: 2px solid black;
 	}
 
-	#links a.button:hover {
-		color: rgb(230, 230, 230);
-		box-shadow: none;
-	}
-
-	pre {
-		font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas,
-			'DejaVu Sans Mono', monospace;
-		font-weight: normal;
-		background: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-		margin: 0;
-	}
-
-	h2 {
-		margin: 0 0 1em;
-		font-weight: normal;
-		color: #111827;
-		font-size: 20px;
-	}
-
-	p {
-		color: #4b5563;
-		font-size: 16px;
-		line-height: 24px;
-		letter-spacing: -0.006em;
-		margin: 0;
-	}
-
-	code {
-		display: inline-block;
-		background:
-			linear-gradient(66.77deg, #f3cddd 0%, #f5cee7 100%) padding-box,
-			linear-gradient(155deg, #d83333 0%, #f041ff 18%, #f5cee7 45%) border-box;
-		border-radius: 8px;
-		border: 1px solid transparent;
-		padding: 6px 8px;
-	}
-
-	.box {
-		padding: 16px;
-		background: rgba(255, 255, 255, 1);
-		border-radius: 16px;
-		border: 1px solid white;
-	}
-
-	#news {
-		position: absolute;
-		bottom: 16px;
-		right: 16px;
-		max-width: 300px;
-		text-decoration: none;
-		transition: background 0.2s;
-		backdrop-filter: blur(50px);
-	}
-
-	#news:hover {
-		background: rgba(0, 0, 0, 0.55);
-	}
-
-	@media screen and (max-height: 368px) {
-		#news {
-			display: none;
-		}
-	}
-
-	@media screen and (max-width: 768px) {
-		#container {
-			display: flex;
-			flex-direction: column;
-		}
-
-		#hero {
-			display: block;
-			padding-top: 10%;
-		}
-
-		#links {
-			flex-wrap: wrap;
-		}
-
-		#links a.button {
-			padding: 14px 18px;
-		}
-
-		#news {
-			right: 16px;
-			left: 16px;
-			bottom: 2.5rem;
-			max-width: 100%;
-		}
-
-		h1 {
-			line-height: 1.5;
-		}
+	#map {
+	margin-top: 20px;
+	width: 100%;
+	height: 400px;
+	border-radius: 12px;
+	box-shadow: 5px 5px 0 rgb(0, 0, 0), 10px 10px 0 white, 15px 15px 0 black;
+	background: #222;
+	border: 2px solid white;
 	}
 </style>
 
 <script>
 	const agencia:HTMLSelectElement = document.getElementById("agencia") as HTMLSelectElement
 	const rutaDoc = document.getElementById("ruta") as HTMLSelectElement
-	export let rutaValue: string;
-	export let agenciaValue: string;
+	const form = document.getElementById("form") as HTMLFormElement
+	const map = document.getElementById("map") as HTMLDivElement
+	import L from "leaflet";
 	
-	
+	const leafletMap = L.map(map).setView([-34.603722, -58.381592], 13);
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(leafletMap);
+
+const markers:any = []
+
+
 	async function numerosColectivos(){
 		const numeros:any = []
-		await fetch('http://localhost:8080/colectivos/numeros')
+		await fetch('http://192.168.100.7:8080/colectivos/numeros')
 	  .then(response => response.json())
 	  .then(data => data.forEach((numero: any) => !numeros.includes(numero) ? numeros.push(numero) : null))
 	  .catch(error => console.error(error));
@@ -198,7 +111,7 @@
 
 	async function rutasDeColectivos(agencia:string) {
 		const rutas:any = []
-		await fetch(`http://localhost:8080/colectivos/rutas/${agencia}`)
+		await fetch(`http://192.168.100.7:8080/colectivos/rutas/${agencia}`)
 	  .then(response => response.json())
 	  .then(data => data.forEach((ruta: any) => !rutas.includes(ruta) ? rutas.push(ruta) : null))
 	  .catch(error => console.error(error));
@@ -235,6 +148,31 @@
 			})
 		}))
 	})
+
+	form.addEventListener('submit', async (e) => {
+		markers.forEach(marker => leafletMap.removeLayer(marker))
+				while(markers.length > 0) {
+					markers.pop()
+				}
+		e.preventDefault()
+		const agenciaValue = agencia.value
+		const rutaValue = rutaDoc.value
+		await fetch('http://192.168.100.7:8080/colectivos-seleccionados', {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify({agencia: agenciaValue, ruta: rutaValue})
+		})
+		.then(response => response.json())
+		.then(data => {
+			data.forEach((colectivo: any) => {
+				markers.push(new L.Marker([colectivo.latitude, colectivo.longitude]))
+				markers.forEach(marker => marker.addTo(leafletMap))
+			})
+		})
+	})
+
 
 
 

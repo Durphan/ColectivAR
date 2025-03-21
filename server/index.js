@@ -16,11 +16,15 @@ app.use(compression());
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
+const base_url =
+  "https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=";
+const client_id = process.env.CLIENT_ID;
+const client_secret = process.env.CLIENT_SECRET;
+const url = `${base_url}${client_id}&client_secret=${client_secret}`;
+
 app.get("/colectivos", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-    );
+    const response = await axios.get(url);
     res.json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -29,9 +33,7 @@ app.get("/colectivos", async (req, res) => {
 
 app.get("/colectivos/numeros", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-    );
+    const response = await axios.get(url);
     const numeros = response.data.map(
       (colectivo) => colectivo.route_short_name
     );
@@ -43,9 +45,7 @@ app.get("/colectivos/numeros", async (req, res) => {
 
 app.get("/colectivos/rutas", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-    );
+    const response = await axios.get(url);
     const rutas = response.data.map((colectivo) => colectivo.trip_headsign);
     res.json(rutas);
   } catch (error) {
@@ -55,9 +55,7 @@ app.get("/colectivos/rutas", async (req, res) => {
 
 app.get("/colectivos/rutas/:numero", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-    );
+    const response = await axios.get(url);
     const rutas = response.data
       .filter((colectivo) => colectivo.route_short_name === req.params.numero)
       .map((colectivo) => colectivo.trip_headsign);
@@ -69,9 +67,7 @@ app.get("/colectivos/rutas/:numero", async (req, res) => {
 
 app.get("/colectivos/:numero/:ruta", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-    );
+    const response = await axios.get(url);
     const colectivos = response.data.filter(
       (colectivo) =>
         colectivo.route_short_name === req.params.numero &&
@@ -85,15 +81,27 @@ app.get("/colectivos/:numero/:ruta", async (req, res) => {
 
 app.get("/colectivos-seleccionados", async (req, res) => {
   try {
-    const response = await axios.get(
-      `https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
-    );
+    const response = await axios.get(url);
     const colectivos = response.data.filter(
       (colectivo) =>
         colectivo.route_short_name === numero &&
         colectivo.trip_headsign === ruta
     );
-    res.json(colectivos);
+    res.json(colectivos).status(200);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/colectivos-seleccionados", async (req, res) => {
+  try {
+    const response = await axios.get(url);
+    const colectivos = response.data.filter(
+      (colectivo) =>
+        colectivo.route_short_name === req.body.agencia &&
+        colectivo.trip_headsign === req.body.ruta
+    );
+    res.json(colectivos).status(200);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

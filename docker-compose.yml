@@ -14,7 +14,6 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/proxy"]
       timeout: 30s
       retries: 5
-    command: ["bun", "run", "start"]
     volumes:
       - ./server:/usr/src/app
   frontend-colectivos:
@@ -23,11 +22,7 @@ services:
     build:
       context: ./cyan-cycle/
       dockerfile: dockerfile
-    volumes:
-      - ./cyan-cycle/src:/usr/code/src
-      - ./cyan-cycle/astro.config.mjs:/usr/code/astro.config.mjs
     ports:
-      - 4321:4321
-    command: ["npm", "run", "dev"]
+      - 4321:3000
     depends_on:
       - proxy-colectivos
