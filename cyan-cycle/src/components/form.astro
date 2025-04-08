@@ -90,6 +90,7 @@
 	const form = document.getElementById("form") as HTMLFormElement
 	const map = document.getElementById("map") as HTMLDivElement
 	import L from "leaflet";
+	const ws = new WebSocket('ws://localhost:8081')
 	
 	const leafletMap = L.map(map).setView([-34.603722, -58.381592], 13);
 	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -149,6 +150,8 @@ const markers:any = []
 		}))
 	})
 
+
+
 	form.addEventListener('submit', async (e) => {
 		markers.forEach(marker => leafletMap.removeLayer(marker))
 				while(markers.length > 0) {
@@ -157,22 +160,8 @@ const markers:any = []
 		e.preventDefault()
 		const agenciaValue = agencia.value
 		const rutaValue = rutaDoc.value
-		await fetch('http://192.168.100.7:8080/colectivos-seleccionados', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({agencia: agenciaValue, ruta: rutaValue})
-		})
-		.then(response => response.json())
-		.then(data => {
-			data.forEach((colectivo: any) => {
-				markers.push(new L.Marker([colectivo.latitude, colectivo.longitude]))
-				markers.forEach(marker => marker.addTo(leafletMap))
-			})
-		})
+		ws.send(JSON.stringify({agencia: agenciaValue, ruta: rutaValue}))
 	})
-
 
 
 

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import axios from "axios";
+import { WebSocketServer } from "ws";
 require("dotenv").config();
 const bodyparser = require("body-parser");
 const compression = require("compression");
@@ -21,6 +22,28 @@ const base_url =
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const url = `${base_url}${client_id}&client_secret=${client_secret}`;
+const wss = new WebSocketServer({ port: 8081 });
+
+wss.on("connection", (ws) => {
+  console.log("Conexion establecida");
+  ws.on("close", () => console.log("Conexion cerrada"));
+  ws.on("messaage", async (message) => {
+    console.log("Mensaje recibido");
+    const data = JSON.parse(message);
+    const { agencia, ruta } = data;
+    try {
+      const response = await axios.get(url);
+      const colectivos = response.data.filter(
+        (colectivo) =>
+          colectivo.route_short_name === agencia &&
+          colectivo.trip_headsign === ruta
+      );
+      ws.send(JSON.stringify(colectivos));
+    } catch (error) {
+      console.error("Error al obtener los datos:", error.message);
+    }
+  });
+});
 
 app.get("/colectivos", async (req, res) => {
   try {
@@ -74,20 +97,6 @@ app.get("/colectivos/:numero/:ruta", async (req, res) => {
         colectivo.trip_headsign === req.params.ruta
     );
     res.json(colectivos);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get("/colectivos-seleccionados", async (req, res) => {
-  try {
-    const response = await axios.get(url);
-    const colectivos = response.data.filter(
-      (colectivo) =>
-        colectivo.route_short_name === numero &&
-        colectivo.trip_headsign === ruta
-    );
-    res.json(colectivos).status(200);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
