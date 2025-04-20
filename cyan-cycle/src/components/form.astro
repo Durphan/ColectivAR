@@ -91,6 +91,7 @@
 	const map = document.getElementById("map") as HTMLDivElement
 	import L from "leaflet";
 	const ws = new WebSocket('ws://localhost:8081')
+
 	
 	const leafletMap = L.map(map).setView([-34.603722, -58.381592], 13);
 	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -100,6 +101,9 @@
 
 const markers:any = []
 
+ws.onmessage = (onmessage) => {
+	console.log(onmessage.data)
+}
 
 	async function numerosColectivos(){
 		const numeros:any = []
@@ -150,13 +154,28 @@ const markers:any = []
 		}))
 	})
 
+function addMarker(lat: number, lng: number) {
+	const marker = L.marker([lat, lng]).addTo(leafletMap);
+	markers.push(marker)
+}
 
-
-	form.addEventListener('submit', async (e) => {
-		markers.forEach(marker => leafletMap.removeLayer(marker))
+ws.onmessage = (onMessage) => {
+	markers.forEach((marker:any) => leafletMap.removeLayer(marker))
 				while(markers.length > 0) {
 					markers.pop()
-				}
+	}
+	const message = JSON.parse(onMessage.data)
+	message.forEach((colectivo:any) => {
+		console.log(colectivo)
+		const lat = colectivo.latitude
+		const lng = colectivo.longitude
+		addMarker(lat, lng)
+	})
+	console.log(message)
+}
+
+	form.addEventListener('submit', async (e) => {
+
 		e.preventDefault()
 		const agenciaValue = agencia.value
 		const rutaValue = rutaDoc.value

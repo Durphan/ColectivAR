@@ -27,21 +27,24 @@ const wss = new WebSocketServer({ port: 8081 });
 wss.on("connection", (ws) => {
   console.log("Conexion establecida");
   ws.on("close", () => console.log("Conexion cerrada"));
-  ws.on("messaage", async (message) => {
+  ws.on("message", (message) => {
     console.log("Mensaje recibido");
     const data = JSON.parse(message);
-    const { agencia, ruta } = data;
-    try {
-      const response = await axios.get(url);
-      const colectivos = response.data.filter(
-        (colectivo) =>
-          colectivo.route_short_name === agencia &&
-          colectivo.trip_headsign === ruta
-      );
-      ws.send(JSON.stringify(colectivos));
-    } catch (error) {
-      console.error("Error al obtener los datos:", error.message);
-    }
+    setInterval(async () => {
+      const { agencia, ruta } = data;
+      try {
+        const response = await axios.get(url);
+        const colectivos = response.data.filter(
+          (colectivo) =>
+            colectivo.route_short_name === agencia &&
+            colectivo.trip_headsign === ruta
+        );
+        ws.send(JSON.stringify(colectivos));
+        console.log("Datos enviados");
+      } catch (error) {
+        console.error("Error al obtener los datos:", error.message);
+      }
+    }, 60000);
   });
 });
 
