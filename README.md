@@ -1,6 +1,9 @@
 # ColectivAR
 
-Este proyecto fue realizado de manera totalmente espontanea, se aplicara una arquitectura en otro momento
+⚠️ Este proyecto fue desarrollado de forma completamente espontánea. 
+Fue una idea rápida y experimental, sin planificación ni estructura formal.
+Puede contener errores, código no optimizado y falta de documentación.
+Úsalo bajo tu propio criterio o si deseas contribuir, ¡eres bienvenido/a!
 
 ### Aplicacion web de seguimiento de colectivos de Buenos Aires
 
