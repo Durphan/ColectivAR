@@ -1,0 +1,22 @@
+{
+  "name": "cyan-cycle",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "host": "astro host",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.16"
+  }
+}

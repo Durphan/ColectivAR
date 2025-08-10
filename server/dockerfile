@@ -1,0 +1,9 @@
+FROM oven/bun:latest
+WORKDIR /usr/code
+COPY ./package.json /usr/code
+COPY ./bun.lockb /usr/code
+COPY ./index.js /usr/code/
+RUN bun install
+CMD [ "bun", "run", "start" ]
+EXPOSE 8080
+EXPOSE 8081

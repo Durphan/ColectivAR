@@ -1,0 +1,184 @@
+<div id="container">	
+<form method="post" action="http://localhost/submit-form" id="form">
+	<label for="agencia">Selecciona la agencia</label>
+	<select name="agencia" id="agencia">
+	</select>
+	<label for="ruta">Selecciona la ruta</label>
+	<select name="ruta" id="ruta">
+	</select>
+	<button type="submit" id="buscar">Buscar</button>
+</form>
+<div id="map">
+</div>
+
+</div>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
+
+	body {
+		font-family: 'Fjalla One', sans-serif;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		background-color: #1a1a1a;
+		margin: 0;
+		color: white;
+	}
+	#container {
+		background: #d90429;
+		padding: 30px;
+		border-radius: 12px;
+		box-shadow: 5px 5px 0 rgb(0, 0, 0), 10px 10px 0 white, 15px 15px 0 black;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 90%;
+		max-width: 500px;
+	}
+	form {
+		width: 100%;
+	}
+	label {
+		font-size: 18px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+	select, button {
+		padding: 12px;
+		font-size: 18px;
+		border: 2px solid black;
+		border-radius: 6px;
+		background: white;
+		color: black;
+		font-weight: bold;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition: all 0.2s ease-in-out;
+	}
+	select:focus, button:focus {
+		outline: none;
+		border-color: white;
+	}
+	button {
+		background: black;
+		color: white;
+		border: 2px solid white;
+	}
+	button:hover {
+		background: white;
+		color: black;
+		border: 2px solid black;
+	}
+
+	#map {
+	margin-top: 20px;
+	width: 100%;
+	height: 400px;
+	border-radius: 12px;
+	box-shadow: 5px 5px 0 rgb(0, 0, 0), 10px 10px 0 white, 15px 15px 0 black;
+	background: #222;
+	border: 2px solid white;
+	}
+</style>
+
+<script>
+	const agencia:HTMLSelectElement = document.getElementById("agencia") as HTMLSelectElement
+	const rutaDoc = document.getElementById("ruta") as HTMLSelectElement
+	const form = document.getElementById("form") as HTMLFormElement
+	const map = document.getElementById("map") as HTMLDivElement
+	import L from "leaflet";
+	const ws = new WebSocket('ws://localhost:8081')
+
+	
+	const leafletMap = L.map(map).setView([-34.603722, -58.381592], 13);
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(leafletMap);
+
+const markers:any = []
+
+ws.onmessage = (onmessage) => {
+	console.log(onmessage.data)
+}
+
+	async function numerosColectivos(){
+		const numeros:any = []
+		await fetch('localhost/colectivos/numeros')
+	  .then(response => response.json())
+	  .then(data => data.forEach((numero: any) => !numeros.includes(numero) ? numeros.push(numero) : null))
+	  .catch(error => console.error(error));
+	return numeros
+	} 
+
+	async function rutasDeColectivos(agencia:string) {
+		const rutas:any = []
+		await fetch(`localhost/colectivos/rutas/${agencia}`)
+	  .then(response => response.json())
+	  .then(data => data.forEach((ruta: any) => !rutas.includes(ruta) ? rutas.push(ruta) : null))
+	  .catch(error => console.error(error));
+	  return rutas
+	}
+	
+
+	
+	numerosColectivos().then((numeros) => {
+		numeros.sort()
+		numeros.forEach((numero: any) => {
+			const option = document.createElement("option")
+			option.value = numero
+			option.text = numero
+			if(agencia) {
+				agencia.appendChild(option)
+			}
+		})
+	})
+
+	agencia?.addEventListener('change', () => {
+		const agenciaValue = agencia.value
+		while(rutaDoc.firstChild) {
+			rutaDoc.removeChild(rutaDoc.firstChild)
+		}
+		rutasDeColectivos(agenciaValue).then((rutas => {
+			rutas.forEach((ruta: string) => {
+				const option = document.createElement("option")
+				option.value = ruta
+				option.text = ruta
+				if(ruta) {
+					rutaDoc.appendChild(option)
+				}
+			})
+		}))
+	})
+
+function addMarker(lat: number, lng: number) {
+	const marker = L.marker([lat, lng]).addTo(leafletMap);
+	markers.push(marker)
+}
+
+ws.onmessage = (onMessage) => {
+	markers.forEach((marker:any) => leafletMap.removeLayer(marker))
+				while(markers.length > 0) {
+					markers.pop()
+	}
+	const message = JSON.parse(onMessage.data)
+	message.forEach((colectivo:any) => {
+		console.log(colectivo)
+		const lat = colectivo.latitude
+		const lng = colectivo.longitude
+		addMarker(lat, lng)
+	})
+	console.log(message)
+}
+
+	form.addEventListener('submit', async (e) => {
+
+		e.preventDefault()
+		const agenciaValue = agencia.value
+		const rutaValue = rutaDoc.value
+		ws.send(JSON.stringify({agencia: agenciaValue, ruta: rutaValue}))
+	})
+</script>

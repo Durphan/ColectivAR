@@ -1,0 +1,29 @@
+services:
+  proxy-colectivos:
+    image: oven/bun:latest
+    container_name: proxy-colectivos
+    restart: always
+    env_file:
+      - ./server/.env
+    ports:
+      - 8080:8080
+      - 8081:8081
+    build:
+      context: ./server/
+      dockerfile: dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/proxy"]
+      timeout: 30s
+      retries: 5
+    volumes:
+      - ./server:/usr/src/app
+  frontend-colectivos:
+    image: npm:22-alpine
+    container_name: frontend-colectivos
+    build:
+      context: ./cyan-cycle/
+      dockerfile: dockerfile
+    ports:
+      - 4321:3000
+    depends_on:
+      - proxy-colectivos
