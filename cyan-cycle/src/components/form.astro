@@ -107,7 +107,7 @@ ws.onmessage = (onmessage) => {
 
 	async function numerosColectivos(){
 		const numeros:any = []
-		await fetch('localhost/colectivos/numeros')
+		await fetch('http://localhost:8080/colectivos/numeros')
 	  .then(response => response.json())
 	  .then(data => data.forEach((numero: any) => !numeros.includes(numero) ? numeros.push(numero) : null))
 	  .catch(error => console.error(error));
@@ -116,7 +116,7 @@ ws.onmessage = (onmessage) => {
 
 	async function rutasDeColectivos(agencia:string) {
 		const rutas:any = []
-		await fetch(`localhost/colectivos/rutas/${agencia}`)
+		await fetch(`http://localhost:8080/colectivos/rutas/${agencia}`)
 	  .then(response => response.json())
 	  .then(data => data.forEach((ruta: any) => !rutas.includes(ruta) ? rutas.push(ruta) : null))
 	  .catch(error => console.error(error));
