@@ -1,15 +1,14 @@
 {
   "name": "server",
-  "module": "index.js",
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
+  "main": "src/index.js",
   "scripts": {
-    "start": "bun run index.js"
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "dependencies": {
     "axios": "^1.7.9",
@@ -17,6 +16,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "morgan": "^1.11.0",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
     "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
+    "vitest": "^3.1.1"
   }
 }
