@@ -1,18 +1,9 @@
 import { Router } from "express";
 import { validateRequiredParams } from "../common/middleware/validate-params.js";
+import type { IBusPositionsController } from "../features/bus-positions/interfaces/bus-positions-controller.js";
+import { wrap } from "../types/express-helpers.js";
 
-function wrap(handler) {
-  return async (req, res, next) => {
-    try {
-      const result = await handler(req, res);
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  };
-}
-
-export function createBusPositionsRouter(controller) {
+export function createBusPositionsRouter(controller: IBusPositionsController) {
   const router = Router();
 
   /**
@@ -37,7 +28,10 @@ export function createBusPositionsRouter(controller) {
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  router.get("/colectivos", wrap(() => controller.getAll()));
+  router.get(
+    "/colectivos",
+    wrap(() => controller.getAll()),
+  );
 
   /**
    * @openapi
@@ -55,7 +49,10 @@ export function createBusPositionsRouter(controller) {
    *               items:
    *                 type: string
    */
-  router.get("/colectivos/numeros", wrap(() => controller.getNumeros()));
+  router.get(
+    "/colectivos/numeros",
+    wrap(() => controller.getNumbers()),
+  );
 
   /**
    * @openapi
@@ -73,7 +70,10 @@ export function createBusPositionsRouter(controller) {
    *               items:
    *                 type: string
    */
-  router.get("/colectivos/rutas", wrap(() => controller.getRutas()));
+  router.get(
+    "/colectivos/rutas",
+    wrap(() => controller.getRoutes()),
+  );
 
   /**
    * @openapi
@@ -107,48 +107,7 @@ export function createBusPositionsRouter(controller) {
   router.get(
     "/colectivos/rutas/:numero",
     validateRequiredParams(["numero"]),
-    wrap((req) => controller.getRutasByNumero(req.params.numero))
-  );
-
-  /**
-   * @openapi
-   * /colectivos/{numero}/{ruta}:
-   *   get:
-   *     summary: Retorna colectivos filtrados por línea y destino
-   *     tags: [Colectivos]
-   *     parameters:
-   *       - in: path
-   *         name: numero
-   *         required: true
-   *         schema:
-   *           type: string
-   *         description: "Número de línea (ej: 15)"
-   *       - in: path
-   *         name: ruta
-   *         required: true
-   *         schema:
-   *           type: string
-   *         description: "Destino (ej: A)"
-   *     responses:
-   *       200:
-   *         description: Array de colectivos filtrados
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items:
-   *                 $ref: '#/components/schemas/VehiclePosition'
-   *       400:
-   *         description: Parámetros faltantes
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/Error'
-   */
-  router.get(
-    "/colectivos/:numero/:ruta",
-    validateRequiredParams(["numero", "ruta"]),
-    wrap((req) => controller.getByNumeroAndRuta(req.params.numero, req.params.ruta))
+    wrap((req) => controller.getRoutesByNumber(req.params.numero as string)),
   );
 
   /**
@@ -192,7 +151,9 @@ export function createBusPositionsRouter(controller) {
   router.post(
     "/colectivos-seleccionados",
     validateRequiredParams(["agencia", "ruta"]),
-    wrap((req) => controller.getByNumeroAndRuta(req.body.agencia, req.body.ruta))
+    wrap((req) =>
+      controller.getByNumberAndRoute(req.body.agencia, req.body.ruta),
+    ),
   );
 
   return router;

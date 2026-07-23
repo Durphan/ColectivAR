@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { IColectivoRepository } from "../../src/features/bus-positions/interfaces/colectivo-repository.js";
 import { BusPositionsService } from "../../src/features/bus-positions/bus-positions.service.js";
+import { VehiclePosition } from "../../src/types/vehicle-position.js";
 
 describe("BusPositionsService", () => {
-  const mockData = [
+  const mockData: VehiclePosition[] = [
     { route_short_name: "15", trip_headsign: "A", vehicle_id: "001" },
     { route_short_name: "15", trip_headsign: "B", vehicle_id: "002" },
     { route_short_name: "29", trip_headsign: "C", vehicle_id: "003" },
@@ -10,8 +12,8 @@ describe("BusPositionsService", () => {
     { route_short_name: "111", trip_headsign: "A", vehicle_id: "005" },
   ];
 
-  let mockRepo;
-  let service;
+  let mockRepo: IColectivoRepository;
+  let service: BusPositionsService;
 
   beforeEach(() => {
     mockRepo = {
@@ -86,7 +88,7 @@ describe("BusPositionsService", () => {
     });
 
     it("should return empty array when BA API returns empty", async () => {
-      mockRepo.fetchAll.mockResolvedValue([]);
+      (mockRepo.fetchAll as ReturnType<typeof vi.fn>).mockResolvedValue([]);
       const result = await service.getByNumeroAndRuta("15", "A");
       expect(result).toEqual([]);
     });
@@ -95,7 +97,7 @@ describe("BusPositionsService", () => {
   describe("error handling", () => {
     it("should propagate repository errors", async () => {
       const error = new Error("API unreachable");
-      mockRepo.fetchAll.mockRejectedValue(error);
+      (mockRepo.fetchAll as ReturnType<typeof vi.fn>).mockRejectedValue(error);
       await expect(service.getAll()).rejects.toThrow("API unreachable");
     });
 

@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { WebSocketServer } from "ws";
-import swaggerUi from "swagger-ui-express";
 import app from "../app.js";
+import swaggerUi from "swagger-ui-express";
 import { router, setupWebSocket, service } from "./injection.js";
 import errorHandler from "./common/middleware/error-handler.js";
 import logger from "./common/config/logger.js";
@@ -25,7 +25,7 @@ import swaggerSpec from "./common/config/swagger.js";
  *                   type: string
  *                   example: ok
  */
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
