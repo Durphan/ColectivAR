@@ -1,113 +1,104 @@
 # ColectivAR
 
-## 📌 Purpose
-This repository contains a web application that allows you to track in real time the location of any bus in Buenos Aires, Argentina.
+API proxy para consultar en tiempo real la ubicación de colectivos en Buenos Aires, Argentina. Consume la API del Gobierno de la Ciudad de Buenos Aires y expone endpoints HTTP + WebSocket.
 
----
+## Stack
 
-## ⚙️ Configuration and Usage
+- **Runtime**: Node.js 22
+- **Package manager**: pnpm
+- **Framework**: Express.js
+- **Lenguaje**: TypeScript
+- **WebSocket**: ws
+- **Tests**: Vitest
+- **Cache**: node-cache
+- **Logging**: Winston + Morgan
+- **Documentación**: Swagger (OpenAPI)
+- **Linting**: ESLint
 
-1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/Durphan/ColectivAR
-    cd ColectivAR
-    ```
+## Requisitos
 
-2. **Create an account** on [API Transporte Buenos Aires](https://api-transporte.buenosaires.gob.ar/).
+- Node.js >= 18 (recomendado 22)
+- pnpm >= 8
+- CLIENT_ID y CLIENT_SECRET de la [API de Transporte de BA](https://api-transporte.buenosaires.gob.ar/)
 
-3. **Create a `.env` file** in the `server` directory and add your client ID and secret token:
-    ```plaintext
-    CLIENT_ID="Your client id token"
-    CLIENT_SECRET="Your client secret token"
-    ```
+## Inicialización
 
-4. **Build the Docker image:**
-    ```bash
-    docker compose build
-    ```
+```bash
+# 1. Clonar
+git clone https://github.com/Durphan/ColectivAR
+cd ColectivAR/server
 
-5. **Run the Docker container:**
-    ```bash
-    docker compose up
-    ```
+# 2. Instalar dependencias
+pnpm install
 
-6. **Access the application** in your browser:  
-   [http://localhost:4321/](http://localhost:4321/)
+# 3. Variables de entorno (crear server/.env)
+CLIENT_ID=tu_client_id
+CLIENT_SECRET=tu_client_secret
 
----
+# 4. Iniciar en desarrollo
+pnpm dev
+```
 
-## 📦 Dependencies and Development Setup
+Servidor HTTP en `http://localhost:8080`. WebSocket en `ws://localhost:8081`. Documentación Swagger en `http://localhost:8080/api-docs`.
 
-**Dependencies:**
-- `astro` ^5.4.0  
-- `axios` ^1.7.9  
-- `compression` ^1.8.0  
-- `cors` ^2.8.5  
-- `dotenv` ^16.4.7  
-- `express` ^4.21.2  
-- `leaflet` ^1.9.4  
-- `ws` ^8.18.1  
+## Docker
 
-**DevDependencies:**
-- `@types/bun` latest  
-- `@types/leaflet` ^1.9.16  
+```bash
+docker compose build
+docker compose up
+```
 
-**PeerDependencies:**
-- `typescript` ^5.0.0  
+## Comandos
 
----
+| Comando | Descripción |
+|---|---|
+| `pnpm dev` | Desarrollo con hot-reload (tsx watch) |
+| `pnpm start` | Producción (Node compilado) |
+| `pnpm build` | Compilar TypeScript |
+| `pnpm test` | Ejecutar tests |
+| `pnpm test:watch` | Tests en modo watch |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | TypeScript check |
 
-### 🛠 Development Environment Setup
+## Endpoints
 
-1. Install **Node.js** and **npm** from the [official website](https://nodejs.org/).
-2. Install **Bun** from the [official site](https://bun.com/).
-3. Clone the repository and navigate to the project directory:
-    ```bash
-    git clone https://github.com/Durphan/ColectivAR
-    cd ColectivAR
-    ```
-4. Navigate to the **front-end** folder and install dependencies:
-    ```bash
-    cd cyan-cycle
-    npm install
-    ```
-5. Run the **front-end**:
-    ```bash
-    npm run dev
-    ```
-6. Navigate to the **back-end** folder and install dependencies:
-    ```bash
-    cd ../server
-    bun install
-    ```
-7. Run the **server**:
-    ```bash
-    bun start
-    ```
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/health` | Health check |
+| GET | `/colectivos` | Todos los colectivos |
+| GET | `/colectivos/numeros` | Todos los números de línea |
+| GET | `/colectivos/rutas` | Todos los destinos |
+| GET | `/colectivos/rutas/:numero` | Destinos filtrados por línea |
+| POST | `/colectivos-seleccionados` | Body: `{agencia, ruta}` |
 
----
+## WebSocket
 
-## 🤝 Contribution Guidelines
+Conectar a `ws://localhost:8081` y enviar:
 
-We welcome contributions to this project!  
+```json
+{ "agencia": "15", "ruta": "A" }
+```
 
-1. Fork the repository.
-2. Create a new branch for your feature or bugfix:
-    ```bash
-    git checkout -b my-feature-branch
-    ```
-3. Make your changes and commit them with a descriptive commit message:
-    ```bash
-    git commit -m "Add new feature"
-    ```
-4. Push your changes to your forked repository:
-    ```bash
-    git push origin my-feature-branch
-    ```
-5. Create a pull request to the main repository.
+El servidor responde cada 30s con los colectivos filtrados.
 
----
+## Arquitectura
 
-## 📜 License
+```
+Routes → Controller → Service → Repository → BA API
+                          ↓
+                      WebSocket (mismo service)
+```
 
-This project is licensed under the **ISC License**. See the [LICENSE](LICENSE) file for more information.
+Cada capa tiene una responsabilidad única y se comunican mediante interfaces (inyección de dependencias).
+
+## Tests
+
+Tests unitarios sobre la capa de Service. El Repository se mockea con `vi.fn()`.
+
+```bash
+pnpm test
+```
+
+## Licencia
+
+ISC. Ver [LICENSE](LICENSE).
