@@ -5,21 +5,21 @@ import type { VehiclePosition } from "../../types/vehicle-position.js";
 import type { ICache } from "../../common/config/interfaces/ICache.js";
 
 export class ColectivoRepository implements IColectivoRepository {
-  private config: AppConfig;
-  private cache: ICache<VehiclePosition[]>;
+  private _config: AppConfig;
+  private _cache: ICache<VehiclePosition[]>;
 
   constructor(config: AppConfig, cache: ICache<VehiclePosition[]>) {
-    this.config = config;
-    this.cache = cache;
+    this._config = config;
+    this._cache = cache;
   }
 
   async fetchAll(): Promise<VehiclePosition[]> {
-    const cachedData = this.cache.get("vehiclePositions");
+    const cachedData = this._cache.get("vehiclePositions");
     if (cachedData) {
       return cachedData;
     }
-    const response = await axios.get<VehiclePosition[]>(this.config.fullUrl);
-    this.cache.set("vehiclePositions", response.data);
+    const response = await axios.get<VehiclePosition[]>(this._config.fullUrl);
+    this._cache.set("vehiclePositions", response.data);
     return response.data;
   }
 

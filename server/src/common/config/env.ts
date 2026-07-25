@@ -1,29 +1,17 @@
+import { parsedEnv } from "../../schemas/env.schema.js";
 import type { AppConfig } from "./types/app-config";
 
 const baseUrl: string =
   "https://apitransporte.buenosaires.gob.ar/colectivos/vehiclePositionsSimple?client_id=";
-const clientId: string | undefined = process.env.CLIENT_ID;
-const clientSecret: string | undefined = process.env.CLIENT_SECRET;
-const log_level: string = process.env.LOG_LEVEL || "info";
 
-const envValidator = {
-  validate(): void {
-    if (!clientId || !clientSecret || !baseUrl) {
-      throw new Error(
-        "Missing required environment variables: CLIENT_ID, CLIENT_SECRET and BASE_URL must be set",
-      );
-    }
-  },
-};
+const { CLIENT_ID, CLIENT_SECRET, LOG_LEVEL } = parsedEnv;
 
-envValidator.validate();
-
-const fullUrl: string = `${baseUrl}${clientId}&client_secret=${clientSecret}`;
+const fullUrl: string = `${baseUrl}${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
 
 export const config: AppConfig = {
   baseUrl,
-  clientId,
-  clientSecret,
+  clientId: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
   fullUrl,
-  log_level,
+  log_level: LOG_LEVEL,
 };

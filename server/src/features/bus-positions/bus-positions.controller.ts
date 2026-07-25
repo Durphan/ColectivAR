@@ -3,32 +3,32 @@ import type { IBusPositionsService } from "./interfaces/bus-positions-service.js
 import type { IBusPositionsController } from "./interfaces/bus-positions-controller.js";
 
 export class BusPositionsController implements IBusPositionsController {
-  private service: IBusPositionsService;
+  private _service: IBusPositionsService;
 
   constructor(service: IBusPositionsService) {
-    this.service = service;
+    this._service = service;
   }
 
   async getAll(): Promise<VehiclePosition[]> {
-    return this.service.getAll();
+    return this._service.getAll();
   }
 
   async getNumbers(): Promise<string[]> {
-    return this.service.getNumbers();
+    return this._service.getNumbers();
   }
 
   async getRoutes(): Promise<string[]> {
-    return this.service.getRoutes();
+    return this._service.getRoutes();
   }
 
   async getRoutesByNumber(numero: string): Promise<string[]> {
-    return this.service.getRoutesByNumber(numero);
+    return this._service.getRoutesByNumber(numero);
   }
 
   async getByNumberAndRoute(
     numero: string,
     ruta: string,
   ): Promise<VehiclePosition[]> {
-    return this.service.getByNumberAndRoute(numero, ruta);
+    return this._service.getByNumberAndRoute(numero, ruta);
   }
 }

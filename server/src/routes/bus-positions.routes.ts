@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { validateRequiredParams } from "../common/middleware/validate-params.js";
+import { validate } from "../common/middleware/zod-validate.js";
+import {
+  numeroSchema,
+  agenciaRutaSchema,
+} from "../schemas/bus-positions.schema.js";
 import type { IBusPositionsController } from "../features/bus-positions/interfaces/bus-positions-controller.js";
 import { wrap } from "../types/express-helpers.js";
 
@@ -106,8 +110,8 @@ export function createBusPositionsRouter(controller: IBusPositionsController) {
    */
   router.get(
     "/colectivos/rutas/:numero",
-    validateRequiredParams(["numero"]),
-    wrap((req) => controller.getRoutesByNumber(req.params.numero as string)),
+    validate(numeroSchema, "params"),
+    wrap((req) => controller.getRoutesByNumber(String(req.params.numero))),
   );
 
   /**
@@ -150,7 +154,7 @@ export function createBusPositionsRouter(controller: IBusPositionsController) {
    */
   router.post(
     "/colectivos-seleccionados",
-    validateRequiredParams(["agencia", "ruta"]),
+    validate(agenciaRutaSchema, "body"),
     wrap((req) =>
       controller.getByNumberAndRoute(req.body.agencia, req.body.ruta),
     ),

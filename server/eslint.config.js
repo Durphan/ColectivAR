@@ -1,14 +1,22 @@
 import globals from "globals";
+import parser from "@babel/eslint-parser";
 
 export default [
   {
+    files: ["src/**/*.ts"],
     languageOptions: {
+      parser,
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ["@babel/preset-typescript"],
+        },
+      },
       globals: { ...globals.node, ...globals.es2021 },
       ecmaVersion: "latest",
       sourceType: "module",
     },
     rules: {
-      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
       "no-console": "error",
       "prefer-const": "error",
       "no-var": "error",
