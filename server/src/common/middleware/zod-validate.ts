@@ -5,7 +5,7 @@ export function validate(
   schema: z.ZodSchema,
   source: "params" | "body" | "query",
 ): (req: Request, res: Response, next: NextFunction) => void {
-  return (req, res, next) => {
+  return (req, _res, next) => {
     try {
       const parsed = schema.parse(req[source]);
       (req as unknown as Record<string, unknown>)[source] = parsed;
