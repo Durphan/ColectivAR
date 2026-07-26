@@ -50,26 +50,26 @@ docker compose up
 
 ## Comandos
 
-| Comando | Descripción |
-|---|---|
-| `pnpm dev` | Desarrollo con hot-reload (tsx watch) |
-| `pnpm start` | Producción (Node compilado) |
-| `pnpm build` | Compilar TypeScript |
-| `pnpm test` | Ejecutar tests |
-| `pnpm test:watch` | Tests en modo watch |
-| `pnpm lint` | ESLint |
-| `pnpm typecheck` | TypeScript check |
+| Comando           | Descripción                           |
+| ----------------- | ------------------------------------- |
+| `pnpm dev`        | Desarrollo con hot-reload (tsx watch) |
+| `pnpm start`      | Producción (Node compilado)           |
+| `pnpm build`      | Compilar TypeScript                   |
+| `pnpm test`       | Ejecutar tests                        |
+| `pnpm test:watch` | Tests en modo watch                   |
+| `pnpm lint`       | ESLint                                |
+| `pnpm typecheck`  | TypeScript check                      |
 
 ## Endpoints
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/health` | Health check |
-| GET | `/colectivos` | Todos los colectivos |
-| GET | `/colectivos/numeros` | Todos los números de línea |
-| GET | `/colectivos/rutas` | Todos los destinos |
-| GET | `/colectivos/rutas/:numero` | Destinos filtrados por línea |
-| POST | `/colectivos-seleccionados` | Body: `{agencia, ruta}` |
+| Método | Ruta                        | Descripción                  |
+| ------ | --------------------------- | ---------------------------- |
+| GET    | `/health`                   | Health check                 |
+| GET    | `/colectivos`               | Todos los colectivos         |
+| GET    | `/colectivos/numeros`       | Todos los números de línea   |
+| GET    | `/colectivos/rutas`         | Todos los destinos           |
+| GET    | `/colectivos/rutas/:numero` | Destinos filtrados por línea |
+| POST   | `/colectivos-seleccionados` | Body: `{agencia, ruta}`      |
 
 ## WebSocket
 
@@ -89,7 +89,7 @@ Routes → Controller → Service → Repository → BA API
                       WebSocket (mismo service)
 ```
 
-Cada capa tiene una responsabilidad única y se comunican mediante interfaces (inyección de dependencias).
+Cada capa se comunica mediante interfaces
 
 ## Tests
 

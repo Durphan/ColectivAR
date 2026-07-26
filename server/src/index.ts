@@ -4,8 +4,10 @@ import app from "../app.js";
 import swaggerUi from "swagger-ui-express";
 import { router, setupWebSocket, service } from "./injection.js";
 import errorHandler from "./common/middleware/error-handler.js";
+
 import logger from "./common/config/logger.js";
 import swaggerSpec from "./common/config/swagger.js";
+import { NotFoundError } from "./errors/NotFoundError.js";
 
 /**
  * @openapi
@@ -32,6 +34,7 @@ app.get("/health", (_req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/", router);
+app.use((_req, _res, next) => next(new NotFoundError("Route not found")));
 app.use(errorHandler);
 
 app.listen(8080, () => {

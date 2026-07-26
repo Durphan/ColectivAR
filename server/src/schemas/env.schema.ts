@@ -1,5 +1,5 @@
 import { z } from "zod";
-import logger from "../common/config/logger";
+import { ValidationError } from "../errors/ValidationError";
 
 export const envSchema = z.object({
   CLIENT_ID: z.string().min(1, "CLIENT_ID es requerida"),
@@ -14,8 +14,9 @@ try {
 } catch (error) {
   if (error instanceof z.ZodError) {
     const missing = error.issues.map((i) => i.path.join(".")).join(", ");
-    logger.error(`Missing required env vars: ${missing}\n`);
-    process.exit(1);
+    throw new ValidationError(`Missing required env vars: ${missing}`, {
+      issues: error.issues,
+    });
   }
   throw error;
 }

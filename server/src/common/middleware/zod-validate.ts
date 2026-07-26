@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 export function validate(
   schema: z.ZodSchema,
@@ -12,11 +12,8 @@ export function validate(
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.issues.map((issue) => ({
-          field: issue.path.join("."),
-          message: issue.message,
-        }));
-        res.status(400).json({ errors, message: "Validation failed" });
+        const zodError = new ZodError(error.issues);
+        next(zodError);
         return;
       }
       next(error);
