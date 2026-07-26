@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 
 export function validate(
   schema: z.ZodSchema,
@@ -12,7 +12,7 @@ export function validate(
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const zodError = new ZodError(error.issues);
+        const zodError = new z.ZodError(error.issues);
         next(zodError);
         return;
       }

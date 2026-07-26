@@ -3,6 +3,7 @@ import type { IColectivoRepository } from "./interfaces/colectivo-repository.js"
 import type { AppConfig } from "../../common/config/types/app-config.js";
 import type { VehiclePosition } from "../../types/vehicle-position.js";
 import type { ICache } from "../../common/config/interfaces/ICache.js";
+import { ExternalApiError } from "../../errors/ExternalApiError.js";
 
 export class ColectivoRepository implements IColectivoRepository {
   private _config: AppConfig;
@@ -14,13 +15,23 @@ export class ColectivoRepository implements IColectivoRepository {
   }
 
   async fetchAll(): Promise<VehiclePosition[]> {
-    const cachedData = this._cache.get("vehiclePositions");
-    if (cachedData) {
-      return cachedData;
+    try {
+      const cachedData = this._cache.get("vehiclePositions");
+      if (cachedData) {
+        return cachedData;
+      }
+      const response = (
+        await axios.get<VehiclePosition[]>(this._config.fullUrl, {
+          timeout: 5000,
+        })
+      ).data;
+      this._cache.set("vehiclePositions", response);
+      return response;
+    } catch (error) {
+      throw new ExternalApiError(
+        "Failed to fetch vehicle positions from external API",
+      );
     }
-    const response = await axios.get<VehiclePosition[]>(this._config.fullUrl);
-    this._cache.set("vehiclePositions", response.data);
-    return response.data;
   }
 
   async getNumbers(): Promise<string[]> {
