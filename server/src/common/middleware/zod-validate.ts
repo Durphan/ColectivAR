@@ -11,11 +11,6 @@ export function validate(
       (req as unknown as Record<string, unknown>)[source] = parsed;
       next();
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        const zodError = new z.ZodError(error.issues);
-        next(zodError);
-        return;
-      }
       next(error);
     }
   };
