@@ -7,11 +7,14 @@ import { createBusPositionsRouter } from "./routes/bus-positions.routes.js";
 import { setupWebSocket } from "./websocket/bus-positions.ws.js";
 import { Cache } from "./common/config/cache.js";
 import type { VehiclePosition } from "./types/vehicle-position.js";
+import { CircuitBreaker } from "./common/circuitBreaker.js";
+import { circuitBreakerConfig } from "./common/config/circuitBreakerConfig.js";
 
 const cache = new Cache<VehiclePosition[]>(30);
-const repository = new ColectivoRepository(config, cache);
+const circuitBreaker = new CircuitBreaker(circuitBreakerConfig);
+const repository = new ColectivoRepository(config, cache, circuitBreaker);
 const service: IBusPositionsService = new BusPositionsService(repository);
 const controller = new BusPositionsController(service);
 const router = createBusPositionsRouter(controller);
 
-export { service, controller, router, setupWebSocket };
+export { service, controller, router, setupWebSocket, circuitBreaker };
