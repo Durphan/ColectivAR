@@ -11,6 +11,7 @@ export class CircuitBreaker {
 	private _config: CircuitBreakerConfig;
 	private _failureCount: number;
 	private _state: CircuitBreakerState;
+	private _timeoutId: NodeJS.Timeout | null = null;
 
 	constructor(config: CircuitBreakerConfig) {
 		this._config = config;
@@ -18,13 +19,21 @@ export class CircuitBreaker {
 		this._state = "CLOSED";
 	}
 
-	public getState(): CircuitBreakerState {
-		return this._state;
+	private _resetFailureCount(): void {
+		this._failureCount = 0;
 	}
 
-	private closeCircuit(): void {
+	private _resetTimeout(): void {
+		if (this._timeoutId) {
+			clearTimeout(this._timeoutId);
+			this._timeoutId = null;
+		}
+	}
+
+	private _closeCircuit(): void {
 		this._state = "CLOSED";
-		this._failureCount = 0;
+		this._resetFailureCount();
+		this._resetTimeout();
 	}
 
 	private _openCircuit(): void {
@@ -36,15 +45,21 @@ export class CircuitBreaker {
 	}
 
 	private _checkFailureThreshold(): void {
+		if (this._state !== "CLOSED") {
+			return;
+		}
 		if (this._failureCount >= this._config.failureThreshold) {
 			this._openCircuit();
-			setTimeout(() => {
-				this._halfOpenCircuit();
-			}, this._config.timeout);
+			if (this._timeoutId === null) {
+				this._timeoutId = setTimeout(() => {
+					this._halfOpenCircuit();
+					this._timeoutId = null;
+				}, this._config.timeout);
+			}
 		}
 	}
 
-	private incrementFailureCount(): void {
+	private _incrementFailureCount(): void {
 		this._failureCount++;
 		this._checkFailureThreshold();
 	}
@@ -57,12 +72,15 @@ export class CircuitBreaker {
 		}
 		try {
 			const result = await fn();
+			if (this._state === "CLOSED") {
+				this._resetFailureCount();
+			}
 			if (this._state === "HALF_OPEN") {
-				this.closeCircuit();
+				this._closeCircuit();
 			}
 			return result;
 		} catch (error) {
-			this.incrementFailureCount();
+			this._incrementFailureCount();
 			return Promise.reject<T>(error);
 		}
 	}
