@@ -1,12 +1,13 @@
 import type { WebSocketServer, WebSocket } from "ws";
 import logger from "../common/config/logger.js";
 import { wsMessageSchema } from "../schemas/bus-positions.schema.js";
-import type { IColectivoPollingService } from "../features/bus-positions/interfaces/colectivo-polling-service.js";
+
 import { AppError } from "../errors/AppError.js";
+import type { IBusPositionsService } from "../features/bus-positions/interfaces/bus-positions-service.js";
 
 export function setupWebSocket(
   wss: WebSocketServer,
-  service: IColectivoPollingService,
+  service: IBusPositionsService,
 ): void {
   wss.on("connection", (ws: WebSocket) => {
     logger.info("Conexion establecida");
@@ -34,26 +35,40 @@ export function setupWebSocket(
             const data = await service.getByNumberAndRoute(agencia, ruta);
             ws.send(JSON.stringify(data));
           } catch (error) {
-            const errorCode = error instanceof AppError ? error.errorCode : "INTERNAL_ERROR";
-            const message = error instanceof Error ? error.message : "Unknown error";
+            const errorCode =
+              error instanceof AppError ? error.errorCode : "INTERNAL_ERROR";
+            const message =
+              error instanceof Error ? error.message : "Unknown error";
             try {
-              ws.send(JSON.stringify({ type: "error", payload: { code: errorCode, message } }));
+              ws.send(
+                JSON.stringify({
+                  type: "error",
+                  payload: { code: errorCode, message },
+                }),
+              );
               logger.debug(`Sent WS error frame: ${errorCode}`);
             } catch (sendError) {
-              logger.warn(`Failed to send WS error frame: ${(sendError as Error).message}`);
+              logger.warn(
+                `Failed to send WS error frame: ${(sendError as Error).message}`,
+              );
             }
           }
         }, 30000);
       } catch (error) {
         logger.warn("Invalid WS message, sending error frame");
-        const message = error instanceof Error ? error.message : "Failed to parse message";
+        const message =
+          error instanceof Error ? error.message : "Failed to parse message";
         try {
-          ws.send(JSON.stringify({
-            type: "error",
-            payload: { code: "VALIDATION_ERROR", message },
-          }));
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              payload: { code: "VALIDATION_ERROR", message },
+            }),
+          );
         } catch (sendError) {
-          logger.warn(`Failed to send WS error frame: ${(sendError as Error).message}`);
+          logger.warn(
+            `Failed to send WS error frame: ${(sendError as Error).message}`,
+          );
         }
       }
     });

@@ -12,7 +12,7 @@ import { circuitBreakerConfig } from "./common/config/circuitBreakerConfig.js";
 
 const cache = new Cache<VehiclePosition[]>(30);
 const circuitBreaker = new CircuitBreaker(circuitBreakerConfig);
-const repository = new ColectivoRepository(config, cache, circuitBreaker);
+const repository = new ColectivoRepository(config, cache);
 const service: IBusPositionsService = new BusPositionsService(repository);
 const controller = new BusPositionsController(service);
 const router = createBusPositionsRouter(controller);
